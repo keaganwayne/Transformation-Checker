@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformations Homework Checker</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --ink: #182033;
+      --muted: #677086;
+      --line: #dbe1ef;
+      --primary: #2857d9;
+      --primary-dark: #173aa1;
+      --soft-primary: #eaf0ff;
+      --green: #147a3f;
+      --red: #b3261e;
+      --yellow: #8a5a00;
+      --shadow: 0 12px 30px rgba(19, 38, 84, 0.12);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at top left, #eaf0ff 0, transparent 32rem), var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    header {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 18px 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 900px;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto 48px;
+      padding: 0 18px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(219, 225, 239, 0.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-pad { padding: 20px; }
+
+    .card-title {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: var(--soft-primary);
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 750;
+      font-size: 0.92rem;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 6px 0 0;
+    }
+
+    select, input, textarea, button {
+      font: inherit;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(40, 87, 217, 0.12);
+    }
+
+    textarea {
+      min-height: 170px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95rem;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mode-panel {
+      display: none;
+      animation: fadeIn 0.16s ease;
+    }
+
+    .mode-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .preset {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 10px;
+      cursor: pointer;
+      font-weight: 750;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .preset:hover {
+      transform: translateY(-1px);
+      border-color: var(--primary);
+      background: var(--soft-primary);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 850;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(40, 87, 217, 0.2);
+    }
+
+    .btn:hover { background: var(--primary-dark); }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--primary-dark);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .result-rule {
+      margin: 0 0 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #10192e;
+      color: #fff;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8faff;
+      color: #3c4660;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
+    .status.good { background: #e9f8ef; color: var(--green); }
+    .status.bad { background: #ffeceb; color: var(--red); }
+    .status.warn { background: #fff6df; color: var(--yellow); }
+
+    .canvas-shell {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: -1px;
+      background: currentColor;
+    }
+
+    .legend .original { color: #2857d9; }
+    .legend .image { color: #d9480f; }
+    .legend .student { color: #6f42c1; }
+
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .rule-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px;
+      background: #fff;
+    }
+
+    .rule-card strong { display: block; margin-bottom: 6px; }
+    .formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    details {
+      margin-top: 18px;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 16px 20px;
+      font-weight: 850;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: "+";
+      float: right;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    details[open] summary::after { content: "–"; }
+
+    .details-body {
+      border-top: 1px solid var(--line);
+      padding: 16px 20px 20px;
+    }
+
+    iframe.embed {
+      display: block;
+      width: 100%;
+      min-height: 900px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .link-row a {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 9px 12px;
+      color: var(--primary-dark);
+      background: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .small-note {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .error {
+      border: 1px solid #ffd4d0;
+      background: #fff2f0;
+      color: var(--red);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin: 10px 0 0;
+      font-weight: 700;
+      display: none;
+    }
+
+    .error.active { display: block; }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .field-grid { grid-template-columns: 1fr; }
+      header { padding-top: 22px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      header, main { max-width: none; }
+      .card, details { box-shadow: none; }
+      .actions, .embed-details { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Transformations Homework Checker</h1>
+    <p class="subtitle">Enter the original vertices from the worksheet, choose the transformation rule, then compare the calculated image points with your own graph.</p>
+  </header>
+
+  <main>
+    <section class="hero-grid">
+      <div class="card card-pad">
+        <h2 class="card-title"><span class="badge">1</span> Choose the problem or rule</h2>
+
+        <label for="presetSelect">Worksheet quick presets</label>
+        <select id="presetSelect">
+          <option value="custom">Custom transformation</option>
+          <option value="13">13) translation: (x, y) → (x + 5, y − 4)</option>
+          <option value="14">14) rotation 180° about the origin</option>
+          <option value="15">15) translation: (x, y) → (x + 2, y + 2)</option>
+          <option value="16">16) translation: (x, y) → (x − 1, y − 2)</option>
+          <option value="17">17) translation: (x, y) → (x − 6, y)</option>
+          <option value="18">18) reflection across the x-axis</option>
+          <option value="37">37) reflection across the x-axis</option>
+          <option value="38">38) reflection across y = x</option>
+          <option value="39">39) reflection across y = −x</option>
+          <option value="40">40) reflection across the x-axis</option>
+          <option value="41">41) rotation 90° counterclockwise about the origin</option>
+          <option value="42">42) rotation 180° about the origin</option>
+        </select>
+        <p class="hint">The presets match the transformation rules shown on the worksheets. You still need to read the original coordinates from the graph.</p>
+
+        <div class="preset-grid" aria-label="Quick buttons">
+          <button class="preset" data-preset="13">Q13</button>
+          <button class="preset" data-preset="14">Q14</button>
+          <button class="preset" data-preset="15">Q15</button>
+          <button class="preset" data-preset="16">Q16</button>
+          <button class="preset" data-preset="17">Q17</button>
+          <button class="preset" data-preset="18">Q18</button>
+          <button class="preset" data-preset="37">Q37</button>
+          <button class="preset" data-preset="38">Q38</button>
+          <button class="preset" data-preset="39">Q39</button>
+          <button class="preset" data-preset="40">Q40</button>
+          <button class="preset" data-preset="41">Q41</button>
+          <button class="preset" data-preset="42">Q42</button>
+        </div>
+
+        <label for="modeSelect">Transformation type</label>
+        <select id="modeSelect">
+          <option value="translation">Translation</option>
+          <option value="reflection">Reflection</option>
+          <option value="rotation">Rotation</option>
+        </select>
+
+        <div id="translationPanel" class="mode-panel active">
+          <div class="field-grid">
+            <div>
+              <label for="hInput">Horizontal movement, h</label>
+              <input id="hInput" type="number" step="0.5" value="5" />
+              <p class="hint">Positive = right. Negative = left.</p>
+            </div>
+            <div>
+              <label for="kInput">Vertical movement, k</label>
+              <input id="kInput" type="number" step="0.5" value="-4" />
+              <p class="hint">Positive = up. Negative = down.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="reflectionPanel" class="mode-panel">
+          <label for="reflectionSelect">Reflection line</label>
+          <select id="reflectionSelect">
+            <option value="xaxis">Across the x-axis</option>
+            <option value="yaxis">Across the y-axis</option>
+            <option value="yEqualsX">Across y = x</option>
+            <option value="yEqualsNegX">Across y = −x</option>
+          </select>
+        </div>
+
+        <div id="rotationPanel" class="mode-panel">
+          <label for="rotationSelect">Rotation about the origin</label>
+          <select id="rotationSelect">
+            <option value="90ccw">90° counterclockwise</option>
+            <option value="90cw">90° clockwise</option>
+            <option value="180">180°</option>
+            <option value="270ccw">270° counterclockwise</option>
+          </select>
+        </div>
+
+        <label for="pointsInput">Original points</label>
+        <textarea id="pointsInput" spellcheck="false">A(-2, 3)
+B(1, 3)
+C(1, 0)</textarea>
+        <p class="hint">Accepted formats: <span class="formula">A(-2, 3)</span>, <span class="formula">B = (1, 0)</span>, or just <span class="formula">(-4, 2)</span>. Put one point on each line.</p>
+
+        <label for="studentInput">Your drawn image points <span class="small-note">optional</span></label>
+        <textarea id="studentInput" spellcheck="false" placeholder="A'(3, -1)
+B'(6, -1)
+C'(6, -4)"></textarea>
+        <p class="hint">Add your answer points to check them. Leave this box empty if you only want the correct coordinates.</p>
+
+        <div id="parseError" class="error"></div>
+
+        <div class="actions">
+          <button class="btn" id="calculateBtn">Calculate / Check</button>
+          <button class="btn secondary" id="clearBtn">Clear points</button>
+          <button class="btn secondary" id="exampleBtn">Load example</button>
+        </div>
+      </div>
+
+      <div class="card card-pad">
+        <h2 class="card-title"><span class="badge">2</span> Results</h2>
+        <p id="ruleOutput" class="result-rule">Rule: (x, y) → (x + 5, y − 4)</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Point</th>
+                <th>Original</th>
+                <th>Correct image</th>
+                <th>Your answer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+          </table>
+        </div>
+
+        <div class="canvas-shell" style="margin-top: 16px;">
+          <canvas id="gridCanvas" width="720" height="560" aria-label="Coordinate graph"></canvas>
+          <div class="legend">
+            <span class="original">Original</span>
+            <span class="image">Correct image</span>
+            <span class="student">Your answer</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-pad" style="margin-top: 18px;">
+      <h2 class="card-title"><span class="badge">3</span> Rule reference</h2>
+      <div class="rules">
+        <div class="rule-card"><strong>Translation</strong><span class="formula">(x, y) → (x + h, y + k)</span><br><span class="small-note">h moves left/right. k moves up/down.</span></div>
+        <div class="rule-card"><strong>Reflect across x-axis</strong><span class="formula">(x, y) → (x, −y)</span></div>
+        <div class="rule-card"><strong>Reflect across y-axis</strong><span class="formula">(x, y) → (−x, y)</span></div>
+        <div class="rule-card"><strong>Reflect across y = x</strong><span class="formula">(x, y) → (y, x)</span></div>
+        <div class="rule-card"><strong>Reflect across y = −x</strong><span class="formula">(x, y) → (−y, −x)</span></div>
+        <div class="rule-card"><strong>Rotate 90° CCW</strong><span class="formula">(x, y) → (−y, x)</span></div>
+        <div class="rule-card"><strong>Rotate 90° CW</strong><span class="formula">(x, y) → (y, −x)</span></div>
+        <div class="rule-card"><strong>Rotate 180°</strong><span class="formula">(x, y) → (−x, −y)</span></div>
+      </div>
+    </section>
+
+    <details class="embed-details">
+      <summary>MathWarehouse rotation interactive</summary>
+      <div class="details-body">
+        <p class="small-note">This loads the MathWarehouse rotation applet inside the page.</p>
+        <iframe class="embed" title="MathWarehouse Rotations" data-src="https://www.mathwarehouse.com/geometry/interactive_applets/iframe.php?file=rotations-in-math" frameborder="0"></iframe>
+      </div>
+    </details>
+
+    <details class="embed-details">
+      <summary>MathWarehouse reflection interactive</summary>
+      <div class="details-body">
+        <p class="small-note">This loads the MathWarehouse reflection applet inside the page.</p>
+        <iframe class="embed" title="MathWarehouse Reflections" data-src="https://www.mathwarehouse.com/geometry/interactive_applets/iframe.php?file=reflections-in-math&cp0x=240&cp1x=420&cp2x=420&cp3x=120&cp0y=120&cp1y=120&cp2y=420&cp3y=420&axis=yaxis&shape=point&m=1&c=1&auto=1&between_lines=1&check-undefined=1&check-attract-points=0" frameborder="0"></iframe>
+      </div>
+    </details>
+
+    <details>
+      <summary>Extra transformation resources</summary>
+      <div class="details-body">
+        <p class="small-note">The embedded applets depend on MathWarehouse being reachable from the student device. The built-in coordinate checker above works without any external scripts.</p>
+        <div class="link-row">
+          <a href="https://www.mathwarehouse.com/transformations/" target="_blank" rel="noopener">Open MathWarehouse transformations</a>
+          <a href="https://www.mathwarehouse.com/transformations/reflections-in-math.php" target="_blank" rel="noopener">Open reflection page</a>
+        </div>
+      </div>
+    </details>
+  </main>
+
+  <script>
+    const presets = {
+      "13": { mode: "translation", h: 5, k: -4 },
+      "14": { mode: "rotation", rotation: "180" },
+      "15": { mode: "translation", h: 2, k: 2 },
+      "16": { mode: "translation", h: -1, k: -2 },
+      "17": { mode: "translation", h: -6, k: 0 },
+      "18": { mode: "reflection", reflection: "xaxis" },
+      "37": { mode: "reflection", reflection: "xaxis" },
+      "38": { mode: "reflection", reflection: "yEqualsX" },
+      "39": { mode: "reflection", reflection: "yEqualsNegX" },
+      "40": { mode: "reflection", reflection: "xaxis" },
+      "41": { mode: "rotation", rotation: "90ccw" },
+      "42": { mode: "rotation", rotation: "180" }
+    };
+
+    const el = {
+      presetSelect: document.getElementById("presetSelect"),
+      modeSelect: document.getElementById("modeSelect"),
+      hInput: document.getElementById("hInput"),
+      kInput: document.getElementById("kInput"),
+      reflectionSelect: document.getElementById("reflectionSelect"),
+      rotationSelect: document.getElementById("rotationSelect"),
+      pointsInput: document.getElementById("pointsInput"),
+      studentInput: document.getElementById("studentInput"),
+      parseError: document.getElementById("parseError"),
+      resultBody: document.getElementById("resultBody"),
+      ruleOutput: document.getElementById("ruleOutput"),
+      canvas: document.getElementById("gridCanvas")
+    };
+
+    function formatNum(value) {
+      const n = Math.abs(value) < 1e-9 ? 0 : value;
+      return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(3)));
+    }
+
+    function pointText(p) {
+      return `(${formatNum(p.x)}, ${formatNum(p.y)})`;
+    }
+
+    function signedPart(value, variable) {
+      const n = Number(value);
+      if (Math.abs(n) < 1e-9) return variable;
+      return `${variable} ${n >= 0 ? "+" : "−"} ${formatNum(Math.abs(n))}`;
+    }
+
+    function getRuleText() {
+      const mode = el.modeSelect.value;
+      if (mode === "translation") {
+        const h = Number(el.hInput.value || 0);
+        const k = Number(el.kInput.value || 0);
+        return `Rule: (x, y) → (${signedPart(h, "x")}, ${signedPart(k, "y")})`;
+      }
+      if (mode === "reflection") {
+        const rules = {
+          xaxis: "Rule: reflection across the x-axis: (x, y) → (x, −y)",
+          yaxis: "Rule: reflection across the y-axis: (x, y) → (−x, y)",
+          yEqualsX: "Rule: reflection across y = x: (x, y) → (y, x)",
+          yEqualsNegX: "Rule: reflection across y = −x: (x, y) → (−y, −x)"
+        };
+        return rules[el.reflectionSelect.value];
+      }
+      const rules = {
+        "90ccw": "Rule: rotation 90° counterclockwise about the origin: (x, y) → (−y, x)",
+        "90cw": "Rule: rotation 90° clockwise about the origin: (x, y) → (y, −x)",
+        "180": "Rule: rotation 180° about the origin: (x, y) → (−x, −y)",
+        "270ccw": "Rule: rotation 270° counterclockwise about the origin: (x, y) → (y, −x)"
+      };
+      return rules[el.rotationSelect.value];
+    }
+
+    function parsePoints(text, fallbackPrefix = "P") {
+      const lines = text.split(/\n+/).map(line => line.trim()).filter(Boolean);
+      const points = [];
+      const errors = [];
+
+      lines.forEach((line, index) => {
+        const labelled = line.match(/^([A-Za-z][A-Za-z0-9]*)\s*'?\s*(?:=|:)?\s*\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?\s*$/);
+        const unlabelled = line.match(/^\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?\s*$/);
+
+        if (labelled) {
+          points.push({ label: labelled[1], x: Number(labelled[2]), y: Number(labelled[3]) });
+        } else if (unlabelled) {
+          points.push({ label: `${fallbackPrefix}${index + 1}`, x: Number(unlabelled[1]), y: Number(unlabelled[2]) });
+        } else {
+          errors.push(`Line ${index + 1}: "${line}"`);
+        }
+      });
+
+      return { points, errors };
+    }
+
+    function transformPoint(p) {
+      const mode = el.modeSelect.value;
+      if (mode === "translation") {
+        return { label: p.label, x: p.x + Number(el.hInput.value || 0), y: p.y + Number(el.kInput.value || 0) };
+      }
+      if (mode === "reflection") {
+        const r = el.reflectionSelect.value;
+        if (r === "xaxis") return { label: p.label, x: p.x, y: -p.y };
+        if (r === "yaxis") return { label: p.label, x: -p.x, y: p.y };
+        if (r === "yEqualsX") return { label: p.label, x: p.y, y: p.x };
+        if (r === "yEqualsNegX") return { label: p.label, x: -p.y, y: -p.x };
+      }
+      const rot = el.rotationSelect.value;
+      if (rot === "90ccw") return { label: p.label, x: -p.y, y: p.x };
+      if (rot === "90cw") return { label: p.label, x: p.y, y: -p.x };
+      if (rot === "180") return { label: p.label, x: -p.x, y: -p.y };
+      if (rot === "270ccw") return { label: p.label, x: p.y, y: -p.x };
+      return { ...p };
+    }
+
+    function samePoint(a, b) {
+      return Boolean(a && b && Math.abs(a.x - b.x) < 0.001 && Math.abs(a.y - b.y) < 0.001);
+    }
+
+    function findStudentPoint(correct, studentPoints, index) {
+      if (!studentPoints.length) return null;
+      const byLabel = studentPoints.find(p => p.label.toLowerCase() === correct.label.toLowerCase());
+      return byLabel || studentPoints[index] || null;
+    }
+
+    function renderResults(original, transformed, studentPoints) {
+      el.resultBody.innerHTML = "";
+
+      if (!original.length) {
+        el.resultBody.innerHTML = `<tr><td colspan="5"><span class="status warn">Enter at least one original point.</span></td></tr>`;
+        return;
+      }
+
+      transformed.forEach((p, index) => {
+        const o = original[index];
+        const student = findStudentPoint(p, studentPoints, index);
+        const status = !student
+          ? `<span class="status warn">Not checked</span>`
+          : samePoint(p, student)
+            ? `<span class="status good">Correct</span>`
+            : `<span class="status bad">Check again</span>`;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><strong>${o.label}</strong> → <strong>${p.label}'</strong></td>
+          <td>${pointText(o)}</td>
+          <td><strong>${pointText(p)}</strong></td>
+          <td>${student ? pointText(student) : "—"}</td>
+          <td>${status}</td>
+        `;
+        el.resultBody.appendChild(row);
+      });
+    }
+
+    function drawGrid(original, transformed, studentPoints) {
+      const canvas = el.canvas;
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const all = [...original, ...transformed, ...studentPoints, { x: 0, y: 0 }];
+      const xs = all.map(p => p.x);
+      const ys = all.map(p => p.y);
+      let minX = Math.floor(Math.min(...xs)) - 2;
+      let maxX = Math.ceil(Math.max(...xs)) + 2;
+      let minY = Math.floor(Math.min(...ys)) - 2;
+      let maxY = Math.ceil(Math.max(...ys)) + 2;
+      minX = Math.min(minX, -8); maxX = Math.max(maxX, 8);
+      minY = Math.min(minY, -8); maxY = Math.max(maxY, 8);
+
+      const pad = 44;
+      const unit = Math.min((w - pad * 2) / (maxX - minX), (h - pad * 2) / (maxY - minY));
+      const sx = x => pad + (x - minX) * unit;
+      const sy = y => h - pad - (y - minY) * unit;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.lineWidth = 1;
+      ctx.font = "12px ui-monospace, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      for (let x = Math.ceil(minX); x <= Math.floor(maxX); x++) {
+        ctx.beginPath();
+        ctx.strokeStyle = x === 0 ? "#25304a" : "#e7ecf6";
+        ctx.lineWidth = x === 0 ? 2 : 1;
+        ctx.moveTo(sx(x), sy(minY));
+        ctx.lineTo(sx(x), sy(maxY));
+        ctx.stroke();
+        if (x !== 0 && Math.abs(x) <= 20) {
+          ctx.fillStyle = "#68728a";
+          ctx.fillText(String(x), sx(x), sy(0) + 16);
+        }
+      }
+
+      for (let y = Math.ceil(minY); y <= Math.floor(maxY); y++) {
+        ctx.beginPath();
+        ctx.strokeStyle = y === 0 ? "#25304a" : "#e7ecf6";
+        ctx.lineWidth = y === 0 ? 2 : 1;
+        ctx.moveTo(sx(minX), sy(y));
+        ctx.lineTo(sx(maxX), sy(y));
+        ctx.stroke();
+        if (y !== 0 && Math.abs(y) <= 20) {
+          ctx.fillStyle = "#68728a";
+          ctx.textAlign = "right";
+          ctx.fillText(String(y), sx(0) - 8, sy(y));
+          ctx.textAlign = "center";
+        }
+      }
+
+      ctx.fillStyle = "#25304a";
+      ctx.fillText("x", sx(maxX) - 10, sy(0) - 12);
+      ctx.fillText("y", sx(0) + 12, sy(maxY) + 12);
+      ctx.fillText("0", sx(0) - 10, sy(0) + 14);
+
+      function drawShape(points, stroke, fill, prime = "") {
+        if (!points.length) return;
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.fillStyle = fill;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        points.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(sx(p.x), sy(p.y));
+          else ctx.lineTo(sx(p.x), sy(p.y));
+        });
+        if (points.length > 2) ctx.closePath();
+        ctx.stroke();
+        points.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(sx(p.x), sy(p.y), 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = stroke;
+          ctx.font = "bold 14px ui-monospace, monospace";
+          ctx.fillText(`${p.label}${prime}`, sx(p.x) + 14, sy(p.y) - 14);
+          ctx.fillStyle = fill;
+        });
+        ctx.restore();
+      }
+
+      drawShape(original, "#2857d9", "#2857d9", "");
+      drawShape(transformed, "#d9480f", "#d9480f", "'");
+      if (studentPoints.length) drawShape(studentPoints, "#6f42c1", "#6f42c1", "?");
+    }
+
+    function updatePanels() {
+      document.querySelectorAll(".mode-panel").forEach(panel => panel.classList.remove("active"));
+      document.getElementById(`${el.modeSelect.value}Panel`).classList.add("active");
+      el.ruleOutput.textContent = getRuleText();
+    }
+
+    function calculate() {
+      el.parseError.classList.remove("active");
+      el.parseError.textContent = "";
+      updatePanels();
+
+      const parsedOriginal = parsePoints(el.pointsInput.value, "P");
+      const parsedStudent = parsePoints(el.studentInput.value, "P");
+      const errors = [];
+      if (parsedOriginal.errors.length) errors.push(`Original point problem: ${parsedOriginal.errors.join("; ")}`);
+      if (el.studentInput.value.trim() && parsedStudent.errors.length) errors.push(`Your answer point problem: ${parsedStudent.errors.join("; ")}`);
+
+      if (errors.length) {
+        el.parseError.textContent = errors.join(" ");
+        el.parseError.classList.add("active");
+      }
+
+      const transformed = parsedOriginal.points.map(transformPoint);
+      renderResults(parsedOriginal.points, transformed, parsedStudent.points);
+      drawGrid(parsedOriginal.points, transformed, parsedStudent.points);
+    }
+
+    function applyPreset(id) {
+      if (!presets[id]) return;
+      const p = presets[id];
+      el.presetSelect.value = id;
+      el.modeSelect.value = p.mode;
+      if (p.mode === "translation") {
+        el.hInput.value = p.h;
+        el.kInput.value = p.k;
+      }
+      if (p.mode === "reflection") el.reflectionSelect.value = p.reflection;
+      if (p.mode === "rotation") el.rotationSelect.value = p.rotation;
+      calculate();
+    }
+
+    document.getElementById("calculateBtn").addEventListener("click", calculate);
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      el.pointsInput.value = "";
+      el.studentInput.value = "";
+      calculate();
+    });
+    document.getElementById("exampleBtn").addEventListener("click", () => {
+      el.pointsInput.value = "A(-2, 3)\nB(1, 3)\nC(1, 0)";
+      el.studentInput.value = "A'(3, -1)\nB'(6, -1)\nC'(6, -4)";
+      el.modeSelect.value = "translation";
+      el.hInput.value = 5;
+      el.kInput.value = -4;
+      el.presetSelect.value = "13";
+      calculate();
+    });
+
+    el.presetSelect.addEventListener("change", event => {
+      if (event.target.value !== "custom") applyPreset(event.target.value);
+      else calculate();
+    });
+
+    document.querySelectorAll(".preset").forEach(button => {
+      button.addEventListener("click", () => applyPreset(button.dataset.preset));
+    });
+
+    [el.modeSelect, el.hInput, el.kInput, el.reflectionSelect, el.rotationSelect, el.pointsInput, el.studentInput].forEach(input => {
+      input.addEventListener("input", () => {
+        if (input !== el.pointsInput && input !== el.studentInput) el.presetSelect.value = "custom";
+        calculate();
+      });
+      input.addEventListener("change", () => {
+        if (input !== el.pointsInput && input !== el.studentInput) el.presetSelect.value = "custom";
+        calculate();
+      });
+    });
+
+    document.querySelectorAll("details.embed-details").forEach(details => {
+      details.addEventListener("toggle", () => {
+        if (!details.open) return;
+        const iframe = details.querySelector("iframe[data-src]");
+        if (iframe && !iframe.src) iframe.src = iframe.dataset.src;
+      });
+    });
+
+    updatePanels();
+    calculate();
+  </script>
+</body>
+</html>
